@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useBillingStore } from '@/lib/store/billingStore';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useCustomerStore } from '@/lib/store/customerStore';
 import Card from '@/components/shared/Card';
 import Input from '@/components/shared/Input';
 import Button from '@/components/shared/Button';
 import Alert from '@/components/shared/Alert';
+import Badge from '@/components/shared/Badge';
 
 interface PaymentSectionProps {
   onSaleComplete?: (sale: any) => void;
@@ -15,12 +17,46 @@ interface PaymentSectionProps {
 export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) {
   const { user } = useAuthStore();
   const { cart, cartTotal, processSale, isLoading, error } = useBillingStore();
+  const { searchCustomerByPhone } = useCustomerStore();
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [customerDetails, setCustomerDetails] = useState({
+    customerId: '',
     name: '',
     phone: '',
     prescriptionNo: '',
+    loyaltyPoints: 0,
   });
+  const [isSearching, setIsSearching] = useState(false);
+  const [customerFound, setCustomerFound] = useState(false);
+
+  const handleSearchCustomer = async () => {
+    if (!customerDetails.phone || customerDetails.phone.length < 10) {
+      return;
+    }
+
+    setIsSearching(true);
+    const customer = await searchCustomerByPhone(customerDetails.phone);
+
+    if (customer) {
+      setCustomerDetails({
+        customerId: customer.id,
+        name: customer.name,
+        phone: customer.phone,
+        prescriptionNo: customerDetails.prescriptionNo,
+        loyaltyPoints: customer.loyaltyPoints || 0,
+      });
+      setCustomerFound(true);
+    } else {
+      setCustomerFound(false);
+      setCustomerDetails({
+        ...customerDetails,
+        customerId: '',
+        name: '',
+        loyaltyPoints: 0,
+      });
+    }
+    setIsSearching(false);
+  };
 
   const handleProcessSale = async () => {
     if (cart.length === 0) {
@@ -29,8 +65,9 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
     }
 
     const saleData = {
+      customerId: customerDetails.customerId || null,
       customerName: customerDetails.name || 'Walk-in Customer',
-      customerPhone: customerDetails.phone,
+      customerPhone: customerDetails.phone || null,
       prescriptionNo: customerDetails.prescriptionNo,
       paymentMethod,
       userId: user?.id || '',
@@ -40,7 +77,8 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
     const sale = await processSale(saleData);
     if (sale && onSaleComplete) {
       onSaleComplete(sale);
-      setCustomerDetails({ name: '', phone: '', prescriptionNo: '' });
+      setCustomerDetails({ customerId: '', name: '', phone: '', prescriptionNo: '', loyaltyPoints: 0 });
+      setCustomerFound(false);
     }
   };
 
@@ -59,21 +97,50 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Customer Details (Optional)</label>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Phone Number"
+              type="tel"
+              value={customerDetails.phone}
+              onChange={(e) => {
+                setCustomerDetails({ ...customerDetails, phone: e.target.value });
+                setCustomerFound(false);
+              }}
+              disabled={isLoading}
+            />
+            <Button
+              variant="secondary"
+              onClick={handleSearchCustomer}
+              isLoading={isSearching}
+              disabled={isLoading || !customerDetails.phone || customerDetails.phone.length < 10}
+            >
+              Search
+            </Button>
+          </div>
+        </div>
+
+        {customerFound && (
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-emerald-900">{customerDetails.name}</p>
+                <p className="text-sm text-emerald-700">Existing Customer</p>
+              </div>
+              <Badge variant="success">
+                {customerDetails.loyaltyPoints} pts
+              </Badge>
+            </div>
+          </div>
+        )}
+
+        {!customerFound && customerDetails.phone && customerDetails.phone.length >= 10 && (
           <Input
-            placeholder="Customer Name"
+            placeholder="Customer Name (Optional for walk-in)"
             value={customerDetails.name}
             onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })}
             disabled={isLoading}
           />
-        </div>
-
-        <Input
-          placeholder="Phone Number"
-          type="tel"
-          value={customerDetails.phone}
-          onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
-          disabled={isLoading}
-        />
+        )}
 
         <Input
           placeholder="Prescription Number"

@@ -24,7 +24,8 @@ export default function SupplierDetailsPage() {
     if (params.id && typeof params.id === 'string') {
       fetchSupplierById(params.id);
     }
-  }, [params.id, fetchSupplierById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
 
   if (authLoading || !user) {
     return null;

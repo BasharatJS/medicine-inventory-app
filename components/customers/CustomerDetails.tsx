@@ -12,11 +12,12 @@ interface CustomerDetailsProps {
 }
 
 export default function CustomerDetails({ customer }: CustomerDetailsProps) {
-  const { purchaseHistory, fetchPurchaseHistory, isLoading } = useCustomerStore();
+  const { purchaseHistory, fetchPurchaseHistory, isPurchaseHistoryLoading } = useCustomerStore();
 
   useEffect(() => {
     fetchPurchaseHistory(customer.id);
-  }, [customer.id, fetchPurchaseHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customer.id]);
 
   return (
     <div className="space-y-6">
@@ -98,7 +99,7 @@ export default function CustomerDetails({ customer }: CustomerDetailsProps) {
       <Card>
         <h2 className="text-xl font-semibold text-slate-800 mb-4">Purchase History</h2>
 
-        {isLoading ? (
+        {isPurchaseHistoryLoading ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner />
           </div>

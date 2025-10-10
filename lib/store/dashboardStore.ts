@@ -78,22 +78,24 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       );
       const todaysSales = salesSnapshot.size;
 
-      // Calculate today's revenue and profit
+      // Calculate today's revenue, cost and profit (same logic as reportStore)
       let todaysRevenue = 0;
-      let todaysProfit = 0;
+      let todaysCost = 0;
 
       salesSnapshot.forEach(doc => {
         const data = doc.data();
         todaysRevenue += data.grandTotal || 0;
 
-        // Calculate profit for each sale
+        // Calculate cost for each sale item
         if (data.items && Array.isArray(data.items)) {
           data.items.forEach((item: any) => {
-            const itemProfit = (item.price - (item.purchasePrice || 0)) * item.quantity;
-            todaysProfit += itemProfit;
+            const itemCost = (item.purchasePrice || 0) * item.quantity;
+            todaysCost += itemCost;
           });
         }
       });
+
+      const todaysProfit = todaysRevenue - todaysCost;
 
       set({
         metrics: {

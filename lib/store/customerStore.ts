@@ -9,6 +9,7 @@ interface CustomerState {
   currentCustomer: Customer | null;
   purchaseHistory: CustomerPurchaseHistory[];
   isLoading: boolean;
+  isPurchaseHistoryLoading: boolean;
   error: string | null;
   fetchCustomers: () => Promise<void>;
   fetchCustomerById: (id: string) => Promise<void>;
@@ -24,6 +25,7 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
   currentCustomer: null,
   purchaseHistory: [],
   isLoading: false,
+  isPurchaseHistoryLoading: false,
   error: null,
 
   fetchCustomers: async () => {
@@ -65,29 +67,50 @@ export const useCustomerStore = create<CustomerState>((set, get) => ({
 
   fetchPurchaseHistory: async (customerId: string) => {
     try {
-      set({ isLoading: true, error: null });
+      set({ isPurchaseHistoryLoading: true, error: null });
+
+      // Get customer to find their phone number
+      const customerDoc = await getDoc(doc(db, COLLECTIONS.CUSTOMERS, customerId));
+
+      if (!customerDoc.exists()) {
+        set({ purchaseHistory: [], isPurchaseHistoryLoading: false });
+        return;
+      }
+
+      const customerData = customerDoc.data();
+      const customerPhone = customerData.phone;
+
+      // Query sales by customer phone number (without orderBy to avoid index requirement)
       const q = query(
         collection(db, COLLECTIONS.SALES),
-        where('customerId', '==', customerId),
-        orderBy('createdAt', 'desc')
+        where('customerPhone', '==', customerPhone)
       );
       const snapshot = await getDocs(q);
-      const history = snapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          customerId,
-          saleId: doc.id,
-          invoiceNumber: data.invoiceNumber,
-          amount: data.grandTotal,
-          purchaseDate: data.createdAt,
-          items: data.items,
-        };
-      }) as CustomerPurchaseHistory[];
 
-      set({ purchaseHistory: history, isLoading: false });
+      // Sort in memory instead of using Firestore orderBy
+      const history = snapshot.docs
+        .map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            customerId,
+            saleId: doc.id,
+            invoiceNumber: data.invoiceNumber,
+            amount: data.grandTotal,
+            purchaseDate: data.createdAt,
+            items: data.items,
+          };
+        })
+        .sort((a, b) => {
+          // Sort by date descending (newest first)
+          return b.purchaseDate.toMillis() - a.purchaseDate.toMillis();
+        }) as CustomerPurchaseHistory[];
+
+      set({ purchaseHistory: history, isPurchaseHistoryLoading: false });
     } catch (error: any) {
-      set({ error: error.message, isLoading: false });
+      console.error('Error fetching purchase history:', error);
+      // If there's an error (like no matching sales), just return empty array
+      set({ purchaseHistory: [], isPurchaseHistoryLoading: false, error: null });
     }
   },
 

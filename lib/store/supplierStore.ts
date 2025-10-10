@@ -10,6 +10,8 @@ interface SupplierState {
   purchaseOrders: PurchaseOrder[];
   payments: SupplierPayment[];
   isLoading: boolean;
+  isOrdersLoading: boolean;
+  isPaymentsLoading: boolean;
   error: string | null;
   fetchSuppliers: () => Promise<void>;
   fetchSupplierById: (id: string) => Promise<void>;
@@ -28,6 +30,8 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
   purchaseOrders: [],
   payments: [],
   isLoading: false,
+  isOrdersLoading: false,
+  isPaymentsLoading: false,
   error: null,
 
   fetchSuppliers: async () => {
@@ -69,7 +73,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
 
   fetchPurchaseOrders: async (supplierId?: string) => {
     try {
-      set({ isLoading: true, error: null });
+      set({ isOrdersLoading: true, error: null });
       let q;
 
       if (supplierId) {
@@ -91,15 +95,15 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
         ...doc.data()
       })) as PurchaseOrder[];
 
-      set({ purchaseOrders: orders, isLoading: false });
+      set({ purchaseOrders: orders, isOrdersLoading: false });
     } catch (error: any) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error.message, isOrdersLoading: false });
     }
   },
 
   fetchSupplierPayments: async (supplierId: string) => {
     try {
-      set({ isLoading: true, error: null });
+      set({ isPaymentsLoading: true, error: null });
       const q = query(
         collection(db, COLLECTIONS.SUPPLIER_PAYMENTS),
         where('supplierId', '==', supplierId),
@@ -111,9 +115,9 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
         ...doc.data()
       })) as SupplierPayment[];
 
-      set({ payments, isLoading: false });
+      set({ payments, isPaymentsLoading: false });
     } catch (error: any) {
-      set({ error: error.message, isLoading: false });
+      set({ error: error.message, isPaymentsLoading: false });
     }
   },
 

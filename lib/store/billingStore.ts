@@ -167,6 +167,22 @@ export const useBillingStore = create<BillingState>((set, get) => ({
         }
       }
 
+      // Update customer stats if customer exists
+      if (saleData.customerId) {
+        const customerRef = doc(db, COLLECTIONS.CUSTOMERS, saleData.customerId);
+
+        // Calculate loyalty points (10% of grand total as points)
+        const loyaltyPointsEarned = Math.floor(cartTotal.grandTotal / 10);
+
+        await updateDoc(customerRef, {
+          totalPurchases: increment(1),
+          totalSpent: increment(cartTotal.grandTotal),
+          loyaltyPoints: increment(loyaltyPointsEarned),
+          lastVisit: Timestamp.now(),
+          updatedAt: Timestamp.now(),
+        });
+      }
+
       set({ isLoading: false });
       return { id: docRef.id, ...sale } as Sale;
     } catch (error: any) {

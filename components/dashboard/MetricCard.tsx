@@ -23,8 +23,10 @@ export default function MetricCard() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Card className="bg-gradient-to-br from-sky-500 to-sky-600 text-white">
+    <div className="space-y-6">
+      {/* First Row - Main Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-sky-500 to-sky-600 text-white">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sky-100 text-sm font-medium">Total Medicines</p>
@@ -86,6 +88,82 @@ export default function MetricCard() {
           </div>
         </div>
       </Card>
+      </div>
+
+      {/* Second Row - Profit Stats (Only for OWNER) */}
+      {user?.role === 'OWNER' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Revenue */}
+          <Card className="bg-gradient-to-br from-sky-500 to-sky-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sky-100 text-sm font-medium">Total Revenue</p>
+                <p className="text-3xl font-bold mt-2">₹{Math.round(metrics.todaysRevenue || 0).toLocaleString()}</p>
+                <p className="text-xs text-sky-100 mt-1">Today's sales</p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-lg">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </Card>
+
+          {/* Total Cost */}
+          <Card className="bg-gradient-to-br from-red-500 to-red-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-red-100 text-sm font-medium">Total Cost</p>
+                <p className="text-3xl font-bold mt-2">
+                  ₹{Math.round((metrics.todaysRevenue || 0) - (metrics.todaysProfit || 0)).toLocaleString()}
+                </p>
+                <p className="text-xs text-red-100 mt-1">Purchase cost</p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-lg">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                </svg>
+              </div>
+            </div>
+          </Card>
+
+          {/* Gross Profit */}
+          <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-emerald-100 text-sm font-medium">Gross Profit</p>
+                <p className="text-3xl font-bold mt-2">₹{Math.round(metrics.todaysProfit || 0).toLocaleString()}</p>
+                <p className="text-xs text-emerald-100 mt-1">Today's earnings</p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-lg">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+            </div>
+          </Card>
+
+          {/* Profit Margin */}
+          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-purple-100 text-sm font-medium">Profit Margin</p>
+                <p className="text-3xl font-bold mt-2">
+                  {metrics.todaysRevenue > 0
+                    ? ((metrics.todaysProfit / metrics.todaysRevenue) * 100).toFixed(1)
+                    : '0'}%
+                </p>
+                <p className="text-xs text-purple-100 mt-1">Profit percentage</p>
+              </div>
+              <div className="bg-white/20 p-3 rounded-lg">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

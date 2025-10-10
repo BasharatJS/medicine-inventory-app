@@ -9,10 +9,13 @@ import Modal from '@/components/shared/Modal';
 import InvoicePreview from './InvoicePreview';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
+type QuickFilterType = 'today' | 'last7days' | 'last30days' | 'alltime' | 'custom';
+
 export default function SalesHistory() {
   const { sales, fetchSales, isLoading } = useBillingStore();
   const [selectedSale, setSelectedSale] = useState<any>(null);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<QuickFilterType>('today');
   const [dateFilter, setDateFilter] = useState({
     from: new Date().toISOString().split('T')[0],
     to: new Date().toISOString().split('T')[0],
@@ -21,6 +24,41 @@ export default function SalesHistory() {
   useEffect(() => {
     fetchSales();
   }, [fetchSales]);
+
+  const handleQuickFilter = (filterType: QuickFilterType) => {
+    setActiveFilter(filterType);
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    switch (filterType) {
+      case 'today':
+        setDateFilter({ from: todayStr, to: todayStr });
+        break;
+      case 'last7days':
+        const sevenDaysAgo = new Date(today);
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        setDateFilter({
+          from: sevenDaysAgo.toISOString().split('T')[0],
+          to: todayStr
+        });
+        break;
+      case 'last30days':
+        const thirtyDaysAgo = new Date(today);
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        setDateFilter({
+          from: thirtyDaysAgo.toISOString().split('T')[0],
+          to: todayStr
+        });
+        break;
+      case 'alltime':
+        // Set to very old date to get all sales
+        setDateFilter({
+          from: '2020-01-01',
+          to: todayStr
+        });
+        break;
+    }
+  };
 
   const filteredSales = sales.filter(sale => {
     const saleDate = new Date(sale.createdAt.toDate()).toISOString().split('T')[0];
@@ -42,24 +80,91 @@ export default function SalesHistory() {
       </div>
 
       <Card>
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-700 mb-2">From Date</label>
-            <input
-              type="date"
-              value={dateFilter.from}
-              onChange={(e) => setDateFilter({ ...dateFilter, from: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900"
-            />
+        {/* Quick Filter Buttons */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-slate-700 mb-3">Quick Filters</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button
+              onClick={() => handleQuickFilter('today')}
+              className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                activeFilter === 'today'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📅 Today
+            </button>
+            <button
+              onClick={() => handleQuickFilter('last7days')}
+              className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                activeFilter === 'last7days'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📊 Last 7 Days
+            </button>
+            <button
+              onClick={() => handleQuickFilter('last30days')}
+              className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                activeFilter === 'last30days'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              📈 Last 30 Days
+            </button>
+            <button
+              onClick={() => handleQuickFilter('alltime')}
+              className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                activeFilter === 'alltime'
+                  ? 'bg-sky-600 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              🌍 All Time
+            </button>
           </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-slate-700 mb-2">To Date</label>
-            <input
-              type="date"
-              value={dateFilter.to}
-              onChange={(e) => setDateFilter({ ...dateFilter, to: e.target.value })}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900"
-            />
+        </div>
+
+        {/* Custom Date Range */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <label className="block text-sm font-medium text-slate-700">Custom Date Range</label>
+            {activeFilter !== 'custom' && (
+              <button
+                onClick={() => setActiveFilter('custom')}
+                className="text-sm text-sky-600 hover:text-sky-700 font-medium"
+              >
+                Use Custom Range
+              </button>
+            )}
+          </div>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="block text-xs text-slate-600 mb-1">From Date</label>
+              <input
+                type="date"
+                value={dateFilter.from}
+                onChange={(e) => {
+                  setDateFilter({ ...dateFilter, from: e.target.value });
+                  setActiveFilter('custom');
+                }}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-slate-600 mb-1">To Date</label>
+              <input
+                type="date"
+                value={dateFilter.to}
+                onChange={(e) => {
+                  setDateFilter({ ...dateFilter, to: e.target.value });
+                  setActiveFilter('custom');
+                }}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-slate-900"
+              />
+            </div>
           </div>
         </div>
 

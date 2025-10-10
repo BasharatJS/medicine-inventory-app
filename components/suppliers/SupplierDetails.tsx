@@ -16,14 +16,15 @@ interface SupplierDetailsProps {
 }
 
 export default function SupplierDetails({ supplier }: SupplierDetailsProps) {
-  const { purchaseOrders, payments, fetchPurchaseOrders, fetchSupplierPayments, isLoading } = useSupplierStore();
+  const { purchaseOrders, payments, fetchPurchaseOrders, fetchSupplierPayments, isOrdersLoading } = useSupplierStore();
   const [showPOModal, setShowPOModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   useEffect(() => {
     fetchPurchaseOrders(supplier.id);
     fetchSupplierPayments(supplier.id);
-  }, [supplier.id, fetchPurchaseOrders, fetchSupplierPayments]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supplier.id]);
 
   return (
     <div className="space-y-6">
@@ -74,7 +75,7 @@ export default function SupplierDetails({ supplier }: SupplierDetailsProps) {
       <Card>
         <h2 className="text-xl font-semibold text-slate-800 mb-4">Purchase Orders</h2>
 
-        {isLoading ? (
+        {isOrdersLoading ? (
           <div className="flex justify-center py-8">
             <LoadingSpinner />
           </div>

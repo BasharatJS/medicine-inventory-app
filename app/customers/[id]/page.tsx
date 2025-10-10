@@ -24,7 +24,8 @@ export default function CustomerDetailsPage() {
     if (params.id && typeof params.id === 'string') {
       fetchCustomerById(params.id);
     }
-  }, [params.id, fetchCustomerById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
 
   if (authLoading || !user) {
     return null;
