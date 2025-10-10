@@ -1,0 +1,130 @@
+'use client';
+
+import { useState } from 'react';
+import { useBillingStore } from '@/lib/store/billingStore';
+import { useAuthStore } from '@/lib/store/authStore';
+import Card from '@/components/shared/Card';
+import Input from '@/components/shared/Input';
+import Button from '@/components/shared/Button';
+import Alert from '@/components/shared/Alert';
+
+interface PaymentSectionProps {
+  onSaleComplete?: (sale: any) => void;
+}
+
+export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) {
+  const { user } = useAuthStore();
+  const { cart, cartTotal, processSale, isLoading, error } = useBillingStore();
+  const [paymentMethod, setPaymentMethod] = useState('CASH');
+  const [customerDetails, setCustomerDetails] = useState({
+    name: '',
+    phone: '',
+    prescriptionNo: '',
+  });
+
+  const handleProcessSale = async () => {
+    if (cart.length === 0) {
+      alert('Cart is empty');
+      return;
+    }
+
+    const saleData = {
+      customerName: customerDetails.name || 'Walk-in Customer',
+      customerPhone: customerDetails.phone,
+      prescriptionNo: customerDetails.prescriptionNo,
+      paymentMethod,
+      userId: user?.id || '',
+      userName: user?.name || '',
+    };
+
+    const sale = await processSale(saleData);
+    if (sale && onSaleComplete) {
+      onSaleComplete(sale);
+      setCustomerDetails({ name: '', phone: '', prescriptionNo: '' });
+    }
+  };
+
+  const paymentMethods = [
+    { value: 'CASH', label: 'Cash', icon: '💵' },
+    { value: 'UPI', label: 'UPI', icon: '📱' },
+    { value: 'CARD', label: 'Card', icon: '💳' },
+  ];
+
+  return (
+    <Card>
+      <h2 className="text-xl font-semibold text-slate-800 mb-4">Payment</h2>
+
+      {error && <Alert type="error" message={error} className="mb-4" />}
+
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Customer Details (Optional)</label>
+          <Input
+            placeholder="Customer Name"
+            value={customerDetails.name}
+            onChange={(e) => setCustomerDetails({ ...customerDetails, name: e.target.value })}
+            disabled={isLoading}
+          />
+        </div>
+
+        <Input
+          placeholder="Phone Number"
+          type="tel"
+          value={customerDetails.phone}
+          onChange={(e) => setCustomerDetails({ ...customerDetails, phone: e.target.value })}
+          disabled={isLoading}
+        />
+
+        <Input
+          placeholder="Prescription Number"
+          value={customerDetails.prescriptionNo}
+          onChange={(e) => setCustomerDetails({ ...customerDetails, prescriptionNo: e.target.value })}
+          disabled={isLoading}
+        />
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+          <div className="grid grid-cols-3 gap-2">
+            {paymentMethods.map((method) => (
+              <button
+                key={method.value}
+                onClick={() => setPaymentMethod(method.value)}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  paymentMethod === method.value
+                    ? 'border-sky-500 bg-sky-50 text-sky-700'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+                disabled={isLoading}
+              >
+                <div className="text-2xl mb-1">{method.icon}</div>
+                <div className="text-sm font-medium">{method.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-slate-200">
+          <div className="bg-slate-50 p-4 rounded-lg mb-4">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-600">Amount to Collect:</span>
+              <span className="text-2xl font-bold text-emerald-600">
+                ₹{Math.round(cartTotal.grandTotal)}
+              </span>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            fullWidth
+            size="lg"
+            onClick={handleProcessSale}
+            isLoading={isLoading}
+            disabled={cart.length === 0}
+          >
+            Complete Sale
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+}

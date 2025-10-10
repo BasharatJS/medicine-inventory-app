@@ -1,0 +1,103 @@
+'use client';
+
+import { useBillingStore } from '@/lib/store/billingStore';
+import { CartItem as CartItemType } from '@/lib/types';
+
+interface CartItemProps {
+  item: CartItemType;
+}
+
+export default function CartItem({ item }: CartItemProps) {
+  const { updateCartItem, removeFromCart } = useBillingStore();
+
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity > 0 && newQuantity <= item.availableStock) {
+      updateCartItem(item.batchId, { quantity: newQuantity });
+    }
+  };
+
+  const handleDiscountChange = (newDiscount: number) => {
+    if (newDiscount >= 0 && newDiscount <= 100) {
+      updateCartItem(item.batchId, { discount: newDiscount });
+    }
+  };
+
+  const subtotal = item.quantity * item.unitPrice;
+  const discountAmount = (subtotal * item.discount) / 100;
+  const afterDiscount = subtotal - discountAmount;
+  const gstAmount = (afterDiscount * item.gstRate) / 100;
+  const total = afterDiscount + gstAmount;
+
+  return (
+    <div className="p-4 bg-slate-50 rounded-lg">
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex-1">
+          <h3 className="font-semibold text-slate-900">{item.medicineName}</h3>
+          <p className="text-sm text-slate-600">Batch: {item.batchNumber}</p>
+        </div>
+        <button
+          onClick={() => removeFromCart(item.batchId)}
+          className="text-red-600 hover:text-red-700"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div>
+          <label className="text-xs text-slate-600 block mb-1">Quantity</label>
+          <input
+            type="number"
+            value={item.quantity}
+            onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
+            min="1"
+            max={item.availableStock}
+            className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+          <p className="text-xs text-slate-500 mt-1">Max: {item.availableStock}</p>
+        </div>
+
+        <div>
+          <label className="text-xs text-slate-600 block mb-1">Unit Price</label>
+          <p className="px-3 py-1.5 bg-slate-100 rounded-lg text-sm font-medium">₹{item.unitPrice}</p>
+        </div>
+
+        <div>
+          <label className="text-xs text-slate-600 block mb-1">Discount (%)</label>
+          <input
+            type="number"
+            value={item.discount}
+            onChange={(e) => handleDiscountChange(parseFloat(e.target.value))}
+            min="0"
+            max="100"
+            step="0.1"
+            className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+          />
+        </div>
+      </div>
+
+      <div className="border-t border-slate-200 pt-3 space-y-1 text-sm">
+        <div className="flex justify-between text-slate-600">
+          <span>Subtotal:</span>
+          <span>₹{subtotal.toFixed(2)}</span>
+        </div>
+        {item.discount > 0 && (
+          <div className="flex justify-between text-emerald-600">
+            <span>Discount ({item.discount}%):</span>
+            <span>-₹{discountAmount.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between text-slate-600">
+          <span>GST ({item.gstRate}%):</span>
+          <span>₹{gstAmount.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between font-bold text-slate-900 pt-2 border-t border-slate-300">
+          <span>Total:</span>
+          <span>₹{total.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
