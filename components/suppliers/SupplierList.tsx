@@ -1,42 +1,61 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSupplierStore } from '@/lib/store/supplierStore';
-import SearchBar from '@/components/inventory/SearchBar';
-import Button from '@/components/shared/Button';
-import Badge from '@/components/shared/Badge';
-import Modal from '@/components/shared/Modal';
-import AddSupplierForm from './AddSupplierForm';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
-import Card from '@/components/shared/Card';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSupplierStore } from '@/lib/store/supplierStore'
+import SearchBar from '@/components/inventory/SearchBar'
+import Button from '@/components/shared/Button'
+import Badge from '@/components/shared/Badge'
+import Modal from '@/components/shared/Modal'
+import AddSupplierForm from './AddSupplierForm'
+import LoadingSpinner from '@/components/shared/LoadingSpinner'
+import Card from '@/components/shared/Card'
 
 export default function SupplierList() {
-  const router = useRouter();
-  const { suppliers, fetchSuppliers, isLoading } = useSupplierStore();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
+  const router = useRouter()
+  const { suppliers, fetchSuppliers, isLoading } = useSupplierStore()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showAddModal, setShowAddModal] = useState(false)
 
   useEffect(() => {
-    fetchSuppliers();
-  }, [fetchSuppliers]);
+    fetchSuppliers()
+  }, [fetchSuppliers])
 
-  const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.phone.includes(searchTerm)
-  );
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.phone.includes(searchTerm)
+  )
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Supplier Management</h1>
-          <p className="text-slate-600 mt-1">{suppliers.length} suppliers registered</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">
+            Supplier Management
+          </h1>
+          <p className="text-slate-600 mt-1">
+            {suppliers.length} suppliers registered
+          </p>
         </div>
-        <Button onClick={() => setShowAddModal(true)} variant="primary">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        <Button
+          onClick={() => setShowAddModal(true)}
+          variant="primary"
+          className="w-full sm:w-auto"
+        >
+          <svg
+            className="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Add Supplier
         </Button>
@@ -65,33 +84,120 @@ export default function SupplierList() {
               <div
                 key={supplier.id}
                 onClick={() => router.push(`/suppliers/${supplier.id}`)}
-                className="p-4 border border-slate-200 rounded-lg hover:border-sky-500 hover:shadow-md transition-all cursor-pointer"
+                className="p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-blue-100 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{supplier.name}</h3>
-                    <p className="text-sm text-slate-600">{supplier.companyName}</p>
-                    <p className="text-xs text-slate-500 mt-1">{supplier.phone}</p>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900 text-lg">
+                      {supplier.name}
+                    </h3>
+                    <p className="text-sm text-slate-600 font-medium flex items-center mt-1">
+                      <svg
+                        className="w-4 h-4 mr-1 text-slate-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                        />
+                      </svg>
+                      {supplier.companyName}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1 flex items-center">
+                      <svg
+                        className="w-3 h-3 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                        />
+                      </svg>
+                      {supplier.phone}
+                    </p>
                   </div>
                   {supplier.rating && (
-                    <Badge variant="success">⭐ {supplier.rating}</Badge>
+                    <Badge variant="success" className="ml-2">
+                      ⭐ {supplier.rating}
+                    </Badge>
                   )}
                 </div>
 
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Total Orders:</span>
-                    <span className="font-medium">{supplier.totalOrders}</span>
+                <div className="space-y-2 text-sm bg-white/60 rounded-lg p-3 backdrop-blur-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      Total Orders:
+                    </span>
+                    <span className="font-semibold text-slate-900">
+                      {supplier.totalOrders}
+                    </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Total Purchase:</span>
-                    <span className="font-medium text-sky-600">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      Total Purchase:
+                    </span>
+                    <span className="font-bold text-sky-600">
                       ₹{supplier.totalPurchaseAmount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Outstanding:</span>
-                    <span className={`font-medium ${supplier.outstandingAmount > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
+                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+                    <span className="text-slate-600 flex items-center">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Outstanding:
+                    </span>
+                    <span
+                      className={`font-bold ${
+                        supplier.outstandingAmount > 0
+                          ? 'text-red-600'
+                          : 'text-emerald-600'
+                      }`}
+                    >
                       ₹{supplier.outstandingAmount.toLocaleString()}
                     </span>
                   </div>
@@ -110,11 +216,11 @@ export default function SupplierList() {
       >
         <AddSupplierForm
           onSuccess={() => {
-            setShowAddModal(false);
-            fetchSuppliers();
+            setShowAddModal(false)
+            fetchSuppliers()
           }}
         />
       </Modal>
     </div>
-  );
+  )
 }

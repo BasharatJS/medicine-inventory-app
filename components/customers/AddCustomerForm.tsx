@@ -11,8 +11,10 @@ interface AddCustomerFormProps {
   onSuccess?: () => void;
 }
 
+// Form to add new customer with personal details and medical info
 export default function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
   const { addCustomer, isLoading, error } = useCustomerStore();
+  // Local state: Customer form data
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -23,6 +25,7 @@ export default function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
     dateOfBirth: '',
   });
 
+  // Submit form: Create customer with optional fields (email, address, DOB, blood group)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -46,8 +49,10 @@ export default function AddCustomerForm({ onSuccess }: AddCustomerFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* UI: Show error alert if customer creation fails */}
       {error && <Alert type="error" message={error} />}
 
+      {/* UI: Customer form fields grid (2 columns on desktop) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           label="Customer Name *"

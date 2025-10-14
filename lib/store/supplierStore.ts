@@ -34,6 +34,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
   isPaymentsLoading: false,
   error: null,
 
+  // Fetch all active suppliers from Firestore, sorted by name
   fetchSuppliers: async () => {
     try {
       set({ isLoading: true, error: null });
@@ -54,6 +55,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Fetch single supplier by ID from Firestore
   fetchSupplierById: async (id: string) => {
     try {
       set({ isLoading: true, error: null });
@@ -71,6 +73,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Fetch purchase orders (all or filtered by supplier), sorted by date
   fetchPurchaseOrders: async (supplierId?: string) => {
     try {
       set({ isOrdersLoading: true, error: null });
@@ -101,6 +104,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Fetch payment history for a specific supplier, sorted by date
   fetchSupplierPayments: async (supplierId: string) => {
     try {
       set({ isPaymentsLoading: true, error: null });
@@ -121,6 +125,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Add new supplier to Firestore with default stats (totalOrders=0, outstandingAmount=0)
   addSupplier: async (data: any) => {
     try {
       set({ isLoading: true, error: null });
@@ -145,6 +150,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Update supplier details in Firestore
   updateSupplier: async (id: string, data: any) => {
     try {
       set({ isLoading: true, error: null });
@@ -161,6 +167,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Create purchase order and update supplier stats (totalOrders, outstandingAmount)
   addPurchaseOrder: async (data: any) => {
     try {
       set({ isLoading: true, error: null });
@@ -196,6 +203,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Update purchase order status (PENDING, CONFIRMED, DELIVERED, CANCELLED)
   updatePurchaseOrderStatus: async (id: string, status: string, actualDeliveryDate?: Date) => {
     try {
       set({ isLoading: true, error: null });
@@ -220,6 +228,7 @@ export const useSupplierStore = create<SupplierState>((set, get) => ({
     }
   },
 
+  // Record payment to supplier and update outstanding balance and PO payment status
   addSupplierPayment: async (data: any) => {
     try {
       set({ isLoading: true, error: null });

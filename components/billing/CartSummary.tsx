@@ -7,9 +7,11 @@ interface CartSummaryProps {
   canApplyDiscount?: boolean;
 }
 
+// Cart summary component: Display cart totals (subtotal, discount, GST, grand total)
 export default function CartSummary({ canApplyDiscount = false }: CartSummaryProps) {
   const { cart, cartTotal } = useBillingStore();
 
+  // UI: Show empty message if no items in cart
   if (cart.length === 0) {
     return (
       <Card>
@@ -19,12 +21,14 @@ export default function CartSummary({ canApplyDiscount = false }: CartSummaryPro
     );
   }
 
+  // Calculate round-off amount (difference between rounded and actual total)
   const roundOff = Math.round(cartTotal.grandTotal) - cartTotal.grandTotal;
 
   return (
     <Card>
       <h2 className="text-xl font-semibold text-slate-800 mb-4">Summary</h2>
 
+      {/* UI: Display cart totals breakdown */}
       <div className="space-y-3">
         <div className="flex justify-between text-slate-600">
           <span>Subtotal:</span>

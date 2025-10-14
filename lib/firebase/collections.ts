@@ -1,13 +1,14 @@
+// Firestore collection names (centralized for consistency)
 export const COLLECTIONS = {
-  USERS: 'users',
-  MEDICINES: 'medicines',
-  BATCHES: 'batches',
-  SALES: 'sales',
-  SETTINGS: 'settings',
-  ACTIVITIES: 'activities',
-  // Phase 2
-  CUSTOMERS: 'customers',
-  SUPPLIERS: 'suppliers',
-  PURCHASE_ORDERS: 'purchaseOrders',
-  SUPPLIER_PAYMENTS: 'supplierPayments',
+  USERS: 'users', // User accounts and roles
+  MEDICINES: 'medicines', // Medicine master data
+  BATCHES: 'batches', // Medicine batches with expiry dates
+  SALES: 'sales', // Sales/billing transactions
+  SETTINGS: 'settings', // App settings
+  ACTIVITIES: 'activities', // Activity logs
+  // Customer & Supplier Management
+  CUSTOMERS: 'customers', // Customer data and loyalty
+  SUPPLIERS: 'suppliers', // Supplier information
+  PURCHASE_ORDERS: 'purchaseOrders', // Purchase orders from suppliers
+  SUPPLIER_PAYMENTS: 'supplierPayments', // Payments to suppliers
 } as const;

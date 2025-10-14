@@ -22,6 +22,7 @@ export const useReportStore = create<ReportState>((set) => ({
   isLoading: false,
   error: null,
 
+  // Generate sales report for date range with top selling medicines and payment methods
   generateSalesReport: async (startDate: Date, endDate: Date) => {
     try {
       set({ isLoading: true, error: null });
@@ -119,6 +120,7 @@ export const useReportStore = create<ReportState>((set) => ({
     }
   },
 
+  // Generate inventory report with stock value, expiry alerts, and category breakdown
   generateInventoryReport: async () => {
     try {
       set({ isLoading: true, error: null });
@@ -202,6 +204,7 @@ export const useReportStore = create<ReportState>((set) => ({
     }
   },
 
+  // Generate profit report calculating revenue, cost, profit margin for date range
   generateProfitReport: async (startDate: Date, endDate: Date) => {
     try {
       set({ isLoading: true, error: null });

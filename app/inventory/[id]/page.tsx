@@ -23,10 +23,12 @@ export default function MedicineDetailsPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (params.id && typeof params.id === 'string') {
-      fetchMedicineById(params.id);
+    const medicineId = params.id;
+    if (medicineId && typeof medicineId === 'string') {
+      fetchMedicineById(medicineId);
     }
-  }, [params.id, fetchMedicineById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.id]);
 
   if (authLoading || !user) {
     return null;

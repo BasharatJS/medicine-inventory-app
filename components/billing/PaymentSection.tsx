@@ -14,10 +14,12 @@ interface PaymentSectionProps {
   onSaleComplete?: (sale: any) => void;
 }
 
+// Payment section: Search customer, select payment method, complete sale
 export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) {
   const { user } = useAuthStore();
   const { cart, cartTotal, processSale, isLoading, error } = useBillingStore();
   const { searchCustomerByPhone } = useCustomerStore();
+  // Local state: Payment method, customer details, search status
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [customerDetails, setCustomerDetails] = useState({
     customerId: '',
@@ -29,6 +31,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
   const [isSearching, setIsSearching] = useState(false);
   const [customerFound, setCustomerFound] = useState(false);
 
+  // Search customer by phone number (validate: min 10 digits)
   const handleSearchCustomer = async () => {
     if (!customerDetails.phone || customerDetails.phone.length < 10) {
       return;
@@ -58,6 +61,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
     setIsSearching(false);
   };
 
+  // Process sale: Create sale, update stock, update customer stats, clear cart
   const handleProcessSale = async () => {
     if (cart.length === 0) {
       alert('Cart is empty');
@@ -92,9 +96,11 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
     <Card>
       <h2 className="text-xl font-semibold text-slate-800 mb-4">Payment</h2>
 
+      {/* UI: Show error alert if sale processing fails */}
       {error && <Alert type="error" message={error} className="mb-4" />}
 
       <div className="space-y-4">
+        {/* UI: Customer search by phone (optional for linking sale to customer) */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Customer Details (Optional)</label>
           <div className="flex gap-2">
@@ -119,6 +125,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
           </div>
         </div>
 
+        {/* UI: Show customer found card with loyalty points */}
         {customerFound && (
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
             <div className="flex items-center justify-between">
@@ -133,6 +140,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
           </div>
         )}
 
+        {/* UI: Show name input for walk-in customer if phone entered but not found */}
         {!customerFound && customerDetails.phone && customerDetails.phone.length >= 10 && (
           <Input
             placeholder="Customer Name (Optional for walk-in)"
@@ -149,6 +157,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
           disabled={isLoading}
         />
 
+        {/* UI: Payment method selection (CASH/UPI/CARD) */}
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
           <div className="grid grid-cols-3 gap-2">
@@ -170,6 +179,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
           </div>
         </div>
 
+        {/* UI: Amount to collect and complete sale button */}
         <div className="pt-4 border-t border-slate-200">
           <div className="bg-slate-50 p-4 rounded-lg mb-4">
             <div className="flex justify-between items-center">

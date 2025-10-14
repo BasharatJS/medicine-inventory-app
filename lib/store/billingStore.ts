@@ -1,3 +1,4 @@
+// Zustand store for POS billing and sales management
 import { create } from 'zustand';
 import { collection, addDoc, getDocs, query, where, orderBy, Timestamp, doc, updateDoc, getDoc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
@@ -31,11 +32,13 @@ export const useBillingStore = create<BillingState>((set, get) => ({
   isLoading: false,
   error: null,
 
+  // Add medicine to cart or increase quantity if already exists
   addToCart: (item: CartItem) => {
     const { cart } = get();
     const existingItem = cart.find(i => i.batchId === item.batchId);
 
     if (existingItem) {
+      // Increase quantity (max: available stock)
       set({
         cart: cart.map(i =>
           i.batchId === item.batchId
@@ -44,12 +47,15 @@ export const useBillingStore = create<BillingState>((set, get) => ({
         ),
       });
     } else {
+      // Add new item to cart
       set({ cart: [...cart, item] });
     }
 
+    // Recalculate cart totals
     get().calculateTotal();
   },
 
+  // Update cart item properties (quantity, discount, etc.)
   updateCartItem: (batchId: string, updates: Partial<CartItem>) => {
     const { cart } = get();
     set({
@@ -60,16 +66,19 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     get().calculateTotal();
   },
 
+  // Remove item from cart
   removeFromCart: (batchId: string) => {
     const { cart } = get();
     set({ cart: cart.filter(item => item.batchId !== batchId) });
     get().calculateTotal();
   },
 
+  // Clear entire cart and reset totals
   clearCart: () => {
     set({ cart: [], cartTotal: { subtotal: 0, totalDiscount: 0, gstAmount: 0, grandTotal: 0 } });
   },
 
+  // Calculate cart totals (subtotal, discount, GST, grand total)
   calculateTotal: () => {
     const { cart } = get();
 
@@ -77,6 +86,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     let totalDiscount = 0;
     let gstAmount = 0;
 
+    // Calculate totals for each item
     cart.forEach(item => {
       const itemSubtotal = item.quantity * item.unitPrice;
       const itemDiscount = (itemSubtotal * item.discount) / 100;
@@ -90,6 +100,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
 
     const grandTotal = subtotal - totalDiscount + gstAmount;
 
+    // Update cart totals in state
     set({
       cartTotal: {
         subtotal,
@@ -100,6 +111,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     });
   },
 
+  // Firestore API: Process sale (create sale, update stock, update customer stats)
   processSale: async (saleData: any) => {
     try {
       set({ isLoading: true, error: null });
@@ -109,9 +121,10 @@ export const useBillingStore = create<BillingState>((set, get) => ({
         throw new Error('Cart is empty');
       }
 
-      // Generate invoice number
+      // Generate unique invoice number
       const invoiceNumber = `INV${Date.now()}`;
 
+      // Prepare sale items with calculated totals
       const saleItems = cart.map(item => {
         const itemSubtotal = item.quantity * item.unitPrice;
         const itemDiscount = (itemSubtotal * item.discount) / 100;
@@ -133,6 +146,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
 
       const roundOff = Math.round(cartTotal.grandTotal) - cartTotal.grandTotal;
 
+      // Prepare sale document
       const sale = {
         invoiceNumber,
         ...saleData,
@@ -145,17 +159,19 @@ export const useBillingStore = create<BillingState>((set, get) => ({
         createdAt: Timestamp.now(),
       };
 
+      // Firestore: Create sale document
       const docRef = await addDoc(collection(db, COLLECTIONS.SALES), sale);
 
-      // Update batch quantities
+      // Firestore: Update batch quantities and medicine stock
       for (const item of cart) {
         const batchRef = doc(db, COLLECTIONS.BATCHES, item.batchId);
+        // Decrement batch quantity
         await updateDoc(batchRef, {
           quantity: increment(-item.quantity),
           updatedAt: Timestamp.now(),
         });
 
-        // Get medicine ID from batch
+        // Get medicine ID from batch and update medicine totalStock
         const batchDoc = await getDoc(batchRef);
         if (batchDoc.exists()) {
           const medicineId = batchDoc.data().medicineId;
@@ -167,13 +183,14 @@ export const useBillingStore = create<BillingState>((set, get) => ({
         }
       }
 
-      // Update customer stats if customer exists
+      // Firestore: Update customer stats if customer linked to sale
       if (saleData.customerId) {
         const customerRef = doc(db, COLLECTIONS.CUSTOMERS, saleData.customerId);
 
-        // Calculate loyalty points (10% of grand total as points)
+        // Calculate loyalty points (10% cashback)
         const loyaltyPointsEarned = Math.floor(cartTotal.grandTotal / 10);
 
+        // Increment customer stats atomically
         await updateDoc(customerRef, {
           totalPurchases: increment(1),
           totalSpent: increment(cartTotal.grandTotal),
@@ -191,6 +208,7 @@ export const useBillingStore = create<BillingState>((set, get) => ({
     }
   },
 
+  // Firestore API: Fetch all sales sorted by date (newest first)
   fetchSales: async () => {
     try {
       set({ isLoading: true, error: null });

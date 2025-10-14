@@ -7,15 +7,18 @@ import { useDashboardStore } from '@/lib/store/dashboardStore';
 import Card from '@/components/shared/Card';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
+// Pharmacist dashboard: Simplified dashboard for pharmacist role with quick actions
 export default function PharmacistDashboard() {
   const router = useRouter();
   const { user } = useAuthStore();
   const { metrics, fetchMetrics, isLoading } = useDashboardStore();
 
+  // useEffect: Fetch dashboard metrics on component mount
   useEffect(() => {
     fetchMetrics();
   }, [fetchMetrics]);
 
+  // UI: Show loading spinner while fetching metrics
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -26,13 +29,13 @@ export default function PharmacistDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
+      {/* UI: Welcome header */}
       <div>
         <h1 className="text-3xl font-bold text-slate-800">Welcome back, {user?.name}!</h1>
         <p className="text-slate-600 mt-1">Pharmacist Dashboard - Operational Management</p>
       </div>
 
-      {/* Metrics Cards */}
+      {/* UI: Key metrics cards (medicines, low stock, expiry, today's sales) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Total Medicines */}
         <Card className="bg-gradient-to-br from-sky-500 to-sky-600 text-white">
@@ -95,7 +98,7 @@ export default function PharmacistDashboard() {
         </Card>
       </div>
 
-      {/* Quick Actions for Pharmacist */}
+      {/* UI: Quick action cards (billing, inventory, expiry, customers, suppliers, history) */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -185,7 +188,7 @@ export default function PharmacistDashboard() {
         </div>
       </div>
 
-      {/* Important Notices */}
+      {/* UI: Important notices section (low stock alerts, expiry alerts) */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 mb-4">Important Notices</h2>
         <div className="space-y-3">

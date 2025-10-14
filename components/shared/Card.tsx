@@ -11,7 +11,7 @@ interface CardProps {
 export default function Card({ children, className = '', onClick }: CardProps) {
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm p-6 ${onClick ? 'cursor-pointer' : ''} ${className}`}
+      className={`bg-white rounded-xl shadow-sm p-4 sm:p-6 ${onClick ? 'cursor-pointer' : ''} ${className}`}
       onClick={onClick}
     >
       {children}

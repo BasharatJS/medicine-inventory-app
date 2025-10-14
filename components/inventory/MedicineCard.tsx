@@ -18,7 +18,7 @@ export default function MedicineCard({ medicine, onClick }: MedicineCardProps) {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+    <Card className="hover:shadow-lg transition-all cursor-pointer bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border border-cyan-100" onClick={onClick}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-semibold text-slate-900 text-lg">{medicine.name}</h3>

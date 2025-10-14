@@ -10,16 +10,19 @@ interface RoleGuardProps {
   allowedRoles?: ('OWNER' | 'PHARMACIST' | 'CASHIER')[];
 }
 
+// Role-based access control component: Protect routes by user role (OWNER/PHARMACIST/CASHIER)
 export default function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
 
+  // useEffect: Redirect to login page if user not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/');
     }
   }, [user, isLoading, router]);
 
+  // UI: Show loading spinner while checking authentication
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -28,10 +31,12 @@ export default function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
     );
   }
 
+  // UI: Return null if no user (redirect will happen via useEffect)
   if (!user) {
     return null;
   }
 
+  // UI: Show access denied message if user role not in allowedRoles
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -43,5 +48,6 @@ export default function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
     );
   }
 
+  // UI: Render children if user has permission
   return <>{children}</>;
 }

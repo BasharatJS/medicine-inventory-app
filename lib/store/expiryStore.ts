@@ -17,6 +17,7 @@ export const useExpiryStore = create<ExpiryState>((set, get) => ({
   isLoading: false,
   error: null,
 
+  // Fetch batches expiring within specified days (0=expired, 30=within 30 days, etc.)
   fetchExpiringBatches: async (daysAhead: number) => {
     try {
       set({ isLoading: true, error: null });
@@ -49,6 +50,7 @@ export const useExpiryStore = create<ExpiryState>((set, get) => ({
     }
   },
 
+  // Mark expired batch as removed by setting quantity to 0 and isExpired flag
   markAsRemoved: async (batchId: string) => {
     try {
       set({ isLoading: true, error: null });

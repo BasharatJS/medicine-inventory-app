@@ -1,3 +1,4 @@
+// Zustand store for dashboard metrics and statistics
 import { create } from 'zustand';
 import { collection, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
@@ -27,31 +28,34 @@ export const useDashboardStore = create<DashboardState>((set) => ({
   isLoading: false,
   error: null,
 
+  // Firestore API: Calculate and fetch dashboard metrics (sales, stock, profit)
   fetchMetrics: async () => {
     try {
       set({ isLoading: true, error: null });
 
-      // Fetch total medicines
+      // Query active medicines
       const medicinesSnapshot = await getDocs(
         query(collection(db, COLLECTIONS.MEDICINES), where('isActive', '==', true))
       );
       const totalMedicines = medicinesSnapshot.size;
 
-      // Calculate low stock items
+      // Calculate low stock items and total inventory value
       let lowStockItems = 0;
       let totalStockValue = 0;
 
       medicinesSnapshot.forEach(doc => {
         const data = doc.data();
+        // Check if stock is below minimum threshold
         if ((data.totalStock || 0) <= data.minStockQty) {
           lowStockItems++;
         }
+        // Calculate inventory value (purchasePrice × totalStock)
         if (data.purchasePrice && data.totalStock) {
           totalStockValue += data.purchasePrice * data.totalStock;
         }
       });
 
-      // Fetch expiring batches (within 30 days)
+      // Count batches expiring within 30 days
       const thirtyDaysFromNow = new Date();
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
@@ -61,12 +65,13 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       batchesSnapshot.forEach(doc => {
         const data = doc.data();
         const expiryDate = data.expiryDate.toDate();
+        // Check if expiring within 30 days and has stock
         if (expiryDate <= thirtyDaysFromNow && expiryDate >= new Date() && data.quantity > 0) {
           expiringSoon++;
         }
       });
 
-      // Fetch today's sales
+      // Query today's sales (from 00:00:00 today)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -78,15 +83,16 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       );
       const todaysSales = salesSnapshot.size;
 
-      // Calculate today's revenue, cost and profit (same logic as reportStore)
+      // Calculate today's revenue, cost and profit (matches reportStore logic)
       let todaysRevenue = 0;
       let todaysCost = 0;
 
       salesSnapshot.forEach(doc => {
         const data = doc.data();
+        // Revenue = sum of grandTotal
         todaysRevenue += data.grandTotal || 0;
 
-        // Calculate cost for each sale item
+        // Cost = sum of (purchasePrice × quantity) for each item
         if (data.items && Array.isArray(data.items)) {
           data.items.forEach((item: any) => {
             const itemCost = (item.purchasePrice || 0) * item.quantity;
@@ -95,8 +101,10 @@ export const useDashboardStore = create<DashboardState>((set) => ({
         }
       });
 
+      // Profit = Revenue - Cost
       const todaysProfit = todaysRevenue - todaysCost;
 
+      // Update metrics state
       set({
         metrics: {
           totalMedicines,
@@ -114,6 +122,7 @@ export const useDashboardStore = create<DashboardState>((set) => ({
     }
   },
 
+  // Firestore API: Fetch recent activities (last 10 sales)
   fetchRecentActivities: async () => {
     try {
       set({ isLoading: true, error: null });

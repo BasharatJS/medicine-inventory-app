@@ -6,14 +6,17 @@ import { useDashboardStore } from '@/lib/store/dashboardStore';
 import Card from '@/components/shared/Card';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
+// Metric card component: Display dashboard metrics (medicines, stock, sales, profit)
 export default function MetricCard() {
   const { user } = useAuthStore();
   const { metrics, fetchMetrics, isLoading } = useDashboardStore();
 
+  // useEffect: Fetch dashboard metrics on component mount
   useEffect(() => {
     fetchMetrics();
   }, [fetchMetrics]);
 
+  // UI: Show loading spinner while fetching metrics
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -24,7 +27,7 @@ export default function MetricCard() {
 
   return (
     <div className="space-y-6">
-      {/* First Row - Main Stats */}
+      {/* UI: First row - Main stats (medicines, low stock, expiry, sales/stock value) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-sky-500 to-sky-600 text-white">
         <div className="flex items-center justify-between">
@@ -90,7 +93,7 @@ export default function MetricCard() {
       </Card>
       </div>
 
-      {/* Second Row - Profit Stats (Only for OWNER) */}
+      {/* UI: Second row - Profit stats (revenue, cost, profit, margin) - OWNER only */}
       {user?.role === 'OWNER' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Revenue */}

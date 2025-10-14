@@ -7,34 +7,41 @@ import { useBillingStore } from '@/lib/store/billingStore';
 import SearchBar from '@/components/inventory/SearchBar';
 import Badge from '@/components/shared/Badge';
 
+// Medicine search component for POS: Search medicine and add batch to cart (FEFO)
 export default function MedicineSearch() {
   const { medicines, fetchMedicines } = useMedicineStore();
   const { batches, fetchBatchesByMedicine } = useBatchStore();
   const { addToCart } = useBillingStore();
+  // Local state: Search term, dropdown visibility, selected medicine ID
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
   const [selectedMedicine, setSelectedMedicine] = useState<string | null>(null);
 
+  // useEffect: Fetch all medicines on component mount
   useEffect(() => {
     fetchMedicines();
   }, [fetchMedicines]);
 
+  // useEffect: Fetch batches when a medicine is selected
   useEffect(() => {
     if (selectedMedicine) {
       fetchBatchesByMedicine(selectedMedicine);
     }
   }, [selectedMedicine, fetchBatchesByMedicine]);
 
+  // Filter medicines by search term (name or generic name), limit to 5 results
   const filteredMedicines = medicines.filter(medicine =>
     medicine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     medicine.genericName.toLowerCase().includes(searchTerm.toLowerCase())
   ).slice(0, 5);
 
+  // Handle medicine selection: Set selected medicine and hide dropdown
   const handleSelectMedicine = (medicineId: string) => {
     setSelectedMedicine(medicineId);
     setShowResults(false);
   };
 
+  // Add selected batch to cart with default quantity=1 and GST=12%
   const handleAddBatchToCart = (batch: any, medicine: any) => {
     addToCart({
       batchId: batch.id,
@@ -53,6 +60,7 @@ export default function MedicineSearch() {
 
   return (
     <div className="space-y-4">
+      {/* UI: Search input for medicine name/generic name */}
       <div className="relative">
         <SearchBar
           value={searchTerm}
@@ -63,6 +71,7 @@ export default function MedicineSearch() {
           placeholder="Search medicine by name or generic name..."
         />
 
+        {/* UI: Dropdown showing filtered medicine results */}
         {showResults && filteredMedicines.length > 0 && (
           <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
             {filteredMedicines.map((medicine) => (
@@ -83,10 +92,12 @@ export default function MedicineSearch() {
         )}
       </div>
 
+      {/* UI: Batch selection (FEFO - First Expiry First Out) sorted by expiry date */}
       {selectedMedicine && batches.length > 0 && (
         <div className="bg-slate-50 p-4 rounded-lg">
           <h3 className="font-semibold text-slate-800 mb-3">Select Batch (FEFO - First Expiry First Out)</h3>
           <div className="space-y-2">
+            {/* Filter batches with quantity > 0, sort by expiry date (earliest first) */}
             {batches
               .filter(b => b.quantity > 0)
               .sort((a, b) => a.expiryDate.toDate().getTime() - b.expiryDate.toDate().getTime())

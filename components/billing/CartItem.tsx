@@ -7,21 +7,25 @@ interface CartItemProps {
   item: CartItemType;
 }
 
+// Cart item component: Display and edit cart item (quantity, discount, price calculation)
 export default function CartItem({ item }: CartItemProps) {
   const { updateCartItem, removeFromCart } = useBillingStore();
 
+  // Update cart item quantity (validate: > 0 and <= availableStock)
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity > 0 && newQuantity <= item.availableStock) {
       updateCartItem(item.batchId, { quantity: newQuantity });
     }
   };
 
+  // Update cart item discount percentage (validate: 0-100%)
   const handleDiscountChange = (newDiscount: number) => {
     if (newDiscount >= 0 && newDiscount <= 100) {
       updateCartItem(item.batchId, { discount: newDiscount });
     }
   };
 
+  // Calculate item totals: subtotal → discount → GST → final total
   const subtotal = item.quantity * item.unitPrice;
   const discountAmount = (subtotal * item.discount) / 100;
   const afterDiscount = subtotal - discountAmount;
@@ -30,6 +34,7 @@ export default function CartItem({ item }: CartItemProps) {
 
   return (
     <div className="p-4 bg-slate-50 rounded-lg">
+      {/* UI: Medicine name, batch number, and remove button */}
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <h3 className="font-semibold text-slate-900">{item.medicineName}</h3>
@@ -45,6 +50,7 @@ export default function CartItem({ item }: CartItemProps) {
         </button>
       </div>
 
+      {/* UI: Editable fields - Quantity, Unit Price (readonly), Discount */}
       <div className="grid grid-cols-3 gap-3 mb-3">
         <div>
           <label className="text-xs text-slate-600 block mb-1">Quantity</label>
@@ -78,6 +84,7 @@ export default function CartItem({ item }: CartItemProps) {
         </div>
       </div>
 
+      {/* UI: Price breakdown - Subtotal, Discount, GST, Total */}
       <div className="border-t border-slate-200 pt-3 space-y-1 text-sm">
         <div className="flex justify-between text-slate-600">
           <span>Subtotal:</span>

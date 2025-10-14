@@ -9,9 +9,11 @@ import Button from '@/components/shared/Button';
 import Alert from '@/components/shared/Alert';
 import Card from '@/components/shared/Card';
 
+// Form to add new medicine to inventory with image upload
 export default function AddMedicineForm() {
   const router = useRouter();
   const { addMedicine, isLoading, error } = useMedicineStore();
+  // Local state: Image file and form data
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -29,6 +31,7 @@ export default function AddMedicineForm() {
 
   const categories = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Ointment', 'Drop', 'Powder', 'Other'];
 
+  // Submit form: Parse numbers, upload image, create medicine, redirect to inventory
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const medicineData = {
@@ -47,8 +50,10 @@ export default function AddMedicineForm() {
   return (
     <form onSubmit={handleSubmit}>
       <Card>
+        {/* UI: Show error alert if medicine creation fails */}
         {error && <Alert type="error" message={error} className="mb-6" />}
 
+        {/* UI: Medicine details form grid (2 columns on desktop) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
             label="Medicine Name *"
@@ -145,6 +150,7 @@ export default function AddMedicineForm() {
             disabled={isLoading}
           />
 
+          {/* UI: Image upload field (optional) */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Medicine Image
@@ -159,6 +165,7 @@ export default function AddMedicineForm() {
           </div>
         </div>
 
+        {/* UI: Form action buttons (Cancel / Add Medicine) */}
         <div className="flex justify-end space-x-4 mt-6">
           <Button
             type="button"

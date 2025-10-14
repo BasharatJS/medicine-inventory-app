@@ -75,7 +75,7 @@ export default function SalesHistory() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Sales History</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Sales History</h1>
         <p className="text-slate-600 mt-1">View and manage past transactions</p>
       </div>
 
@@ -183,50 +183,110 @@ export default function SalesHistory() {
             <p className="text-slate-600">No sales found for the selected period</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoice</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Items</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {filteredSales.map((sale) => (
-                  <tr key={sale.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 font-medium text-slate-900">{sale.invoiceNumber}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      {new Date(sale.createdAt.toDate()).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{sale.customerName}</td>
-                    <td className="px-6 py-4">
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {filteredSales.map((sale) => (
+                <div
+                  key={sale.id}
+                  className="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 rounded-xl p-4 hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-xs text-slate-500 uppercase font-medium mb-1">Invoice</p>
+                      <p className="font-semibold text-slate-900">{sale.invoiceNumber}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500 mb-1">Date</p>
+                      <p className="text-xs text-slate-600">
+                        {new Date(sale.createdAt.toDate()).toLocaleDateString()}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {new Date(sale.createdAt.toDate()).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-sm mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Customer:</span>
+                      <span className="font-medium text-slate-900">{sale.customerName}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Items:</span>
                       <Badge variant="info">{sale.items.length} items</Badge>
-                    </td>
-                    <td className="px-6 py-4">
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Payment:</span>
                       <Badge variant="success">{sale.paymentMethod}</Badge>
-                    </td>
-                    <td className="px-6 py-4 font-semibold text-emerald-600">
-                      ₹{Math.round(sale.grandTotal)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => handleViewInvoice(sale)}
-                      >
-                        View Invoice
-                      </Button>
-                    </td>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-300">
+                    <div>
+                      <p className="text-xs text-slate-500 mb-1">Total Amount</p>
+                      <p className="text-xl font-bold text-emerald-600">
+                        ₹{Math.round(sale.grandTotal).toLocaleString()}
+                      </p>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleViewInvoice(sale)}
+                    >
+                      View Invoice
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Invoice</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Items</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Payment</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {filteredSales.map((sale) => (
+                    <tr key={sale.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 font-medium text-slate-900">{sale.invoiceNumber}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        {new Date(sale.createdAt.toDate()).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-600">{sale.customerName}</td>
+                      <td className="px-6 py-4">
+                        <Badge variant="info">{sale.items.length} items</Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge variant="success">{sale.paymentMethod}</Badge>
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-emerald-600">
+                        ₹{Math.round(sale.grandTotal)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => handleViewInvoice(sale)}
+                        >
+                          View Invoice
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </Card>
 

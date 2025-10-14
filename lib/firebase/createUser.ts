@@ -5,6 +5,7 @@ import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from './config';
 import { COLLECTIONS } from './collections';
 
+// Create user profile document in Firestore after Firebase Authentication signup
 export async function createUserDocument(
   uid: string,
   email: string,
