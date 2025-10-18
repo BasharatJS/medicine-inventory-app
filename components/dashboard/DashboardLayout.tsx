@@ -18,11 +18,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className={`min-h-screen ${theme.content.bg}`}>
+    <div className={`min-h-screen ${theme.content.bg} overflow-x-hidden`}>
       <Header onMenuClick={toggleSidebar} isSidebarOpen={isSidebarOpen} />
       <div className={`flex min-h-screen ${theme.content.bg}`}>
         <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        <main className="flex-1 p-4 sm:p-6 lg:ml-64 mt-16">
+        <main className="flex-1 p-4 sm:p-6 lg:ml-64 mt-16 max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupplierStore } from '@/lib/store/supplierStore'
+import { useTheme } from '@/lib/contexts/ThemeContext'
 import SearchBar from '@/components/inventory/SearchBar'
 import Button from '@/components/shared/Button'
 import Badge from '@/components/shared/Badge'
@@ -14,6 +15,7 @@ import Card from '@/components/shared/Card'
 export default function SupplierList() {
   const router = useRouter()
   const { suppliers, fetchSuppliers, isLoading } = useSupplierStore()
+  const { theme, themeName } = useTheme()
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
 
@@ -32,10 +34,10 @@ export default function SupplierList() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">
+          <h1 className={`text-2xl sm:text-3xl font-bold ${theme.content.text}`}>
             Supplier Management
           </h1>
-          <p className="text-slate-600 mt-1">
+          <p className={`${theme.content.textSecondary} mt-1`}>
             {suppliers.length} suppliers registered
           </p>
         </div>
@@ -76,7 +78,7 @@ export default function SupplierList() {
           </div>
         ) : filteredSuppliers.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-slate-600">No suppliers found</p>
+            <p className={theme.content.textSecondary}>No suppliers found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -84,16 +86,16 @@ export default function SupplierList() {
               <div
                 key={supplier.id}
                 onClick={() => router.push(`/suppliers/${supplier.id}`)}
-                className="p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-blue-100 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer"
+                className={`p-4 ${themeName === 'dark' ? 'bg-gradient-to-br from-gray-700 to-gray-800 border-gray-600' : themeName === 'green' ? 'bg-white border-emerald-200' : themeName === 'purple' ? 'bg-white border-purple-200' : themeName === 'amber' ? 'bg-white border-amber-200' : 'bg-white border-slate-200'} border rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer`}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 text-lg">
+                    <h3 className={`font-semibold ${theme.content.text} text-lg`}>
                       {supplier.name}
                     </h3>
-                    <p className="text-sm text-slate-600 font-medium flex items-center mt-1">
+                    <p className={`text-sm ${theme.content.textSecondary} font-medium flex items-center mt-1`}>
                       <svg
-                        className="w-4 h-4 mr-1 text-slate-500"
+                        className={`w-4 h-4 mr-1 ${theme.content.textSecondary}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -107,7 +109,7 @@ export default function SupplierList() {
                       </svg>
                       {supplier.companyName}
                     </p>
-                    <p className="text-xs text-slate-500 mt-1 flex items-center">
+                    <p className={`text-xs ${theme.content.textSecondary} mt-1 flex items-center`}>
                       <svg
                         className="w-3 h-3 mr-1"
                         fill="none"
@@ -131,9 +133,9 @@ export default function SupplierList() {
                   )}
                 </div>
 
-                <div className="space-y-2 text-sm bg-white/60 rounded-lg p-3 backdrop-blur-sm">
+                <div className={`space-y-2 text-sm ${themeName === 'dark' ? 'bg-gray-600/30' : 'bg-white/60'} rounded-lg p-3 backdrop-blur-sm`}>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600 flex items-center">
+                    <span className={`${theme.content.textSecondary} flex items-center`}>
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="none"
@@ -149,12 +151,12 @@ export default function SupplierList() {
                       </svg>
                       Total Orders:
                     </span>
-                    <span className="font-semibold text-slate-900">
+                    <span className={`font-semibold ${theme.content.text}`}>
                       {supplier.totalOrders}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600 flex items-center">
+                    <span className={`${theme.content.textSecondary} flex items-center`}>
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="none"
@@ -170,12 +172,12 @@ export default function SupplierList() {
                       </svg>
                       Total Purchase:
                     </span>
-                    <span className="font-bold text-sky-600">
+                    <span className={`font-bold ${themeName === 'dark' ? 'text-emerald-400' : themeName === 'green' ? 'text-emerald-600' : themeName === 'purple' ? 'text-purple-600' : themeName === 'amber' ? 'text-amber-600' : 'text-sky-600'}`}>
                       ₹{supplier.totalPurchaseAmount.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-                    <span className="text-slate-600 flex items-center">
+                  <div className={`flex justify-between items-center pt-2 border-t ${theme.content.cardBorder}`}>
+                    <span className={`${theme.content.textSecondary} flex items-center`}>
                       <svg
                         className="w-4 h-4 mr-1"
                         fill="none"
