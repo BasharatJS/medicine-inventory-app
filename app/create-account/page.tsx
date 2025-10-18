@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { auth, db } from '@/lib/firebase/config';
 import { COLLECTIONS } from '@/lib/firebase/collections';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import Input from '@/components/shared/Input';
 import Select from '@/components/shared/Select';
 import Button from '@/components/shared/Button';
@@ -12,6 +13,7 @@ import Alert from '@/components/shared/Alert';
 
 export default function CreateAccountPage() {
   const router = useRouter();
+  const { theme, themeName } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
@@ -66,16 +68,16 @@ export default function CreateAccountPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-sky-50 to-emerald-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <main className={`min-h-screen ${themeName === 'dark' ? 'bg-gradient-to-br from-gray-900 to-gray-800' : themeName === 'green' ? 'bg-gradient-to-br from-emerald-50 to-teal-50' : themeName === 'purple' ? 'bg-gradient-to-br from-purple-50 to-pink-50' : themeName === 'amber' ? 'bg-gradient-to-br from-amber-50 to-orange-50' : 'bg-gradient-to-br from-sky-50 to-emerald-50'} flex items-center justify-center p-4`}>
+      <div className={`${theme.content.cardBg} rounded-2xl shadow-2xl p-8 w-full max-w-md border ${theme.content.cardBorder}`}>
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-cyan-600 rounded-2xl mb-4">
+          <div className={`inline-flex items-center justify-center w-16 h-16 ${themeName === 'dark' ? 'bg-gray-700' : themeName === 'green' ? 'bg-emerald-600' : themeName === 'purple' ? 'bg-purple-600' : themeName === 'amber' ? 'bg-amber-600' : 'bg-cyan-600'} rounded-2xl mb-4`}>
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-slate-800">Create Account</h1>
-          <p className="text-slate-600 mt-2">Register your profile</p>
+          <h1 className={`text-3xl font-bold ${theme.content.text}`}>Create Account</h1>
+          <p className={`${theme.content.textSecondary} mt-2`}>Register your profile</p>
         </div>
 
         {error && <Alert type="error" message={error} className="mb-6" />}
@@ -129,11 +131,11 @@ export default function CreateAccountPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-sm text-slate-600">
+          <p className={`text-sm ${theme.content.textSecondary}`}>
             Already have an account?{' '}
             <button
               onClick={() => router.push('/')}
-              className="text-sky-600 hover:text-sky-700 font-medium"
+              className={`${themeName === 'dark' ? 'text-emerald-400 hover:text-emerald-300' : themeName === 'green' ? 'text-emerald-600 hover:text-emerald-700' : themeName === 'purple' ? 'text-purple-600 hover:text-purple-700' : themeName === 'amber' ? 'text-amber-600 hover:text-amber-700' : 'text-sky-600 hover:text-sky-700'} font-medium`}
             >
               Login here
             </button>

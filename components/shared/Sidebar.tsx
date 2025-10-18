@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { theme } = useTheme();
 
   const handleNavigation = (path: string) => {
     router.push(path);
@@ -119,41 +121,41 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-slate-200 z-50 transition-transform duration-300 ease-in-out flex flex-col
+          fixed left-0 top-16 bottom-0 w-64 ${theme.sidebar.bg} border-r ${theme.sidebar.border} z-50 transition-transform duration-300 ease-in-out flex flex-col shadow-xl scrollbar-hide
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0
         `}
       >
         {/* Navigation Menu */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {menuItems.filter(item => item.show).map((item) => {
             const isActive = pathname === item.path || pathname.startsWith(item.path + '/');
             return (
               <button
                 key={item.path}
                 onClick={() => handleNavigation(item.path)}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+                className={`w-full flex items-center space-x-3 px-3 py-3 rounded-lg transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-cyan-600 text-white'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? `${theme.sidebar.activeBg} ${theme.sidebar.activeText} shadow-md`
+                    : `${theme.sidebar.text} hover:${theme.sidebar.bgHover} hover:${theme.sidebar.textHover}`
                 }`}
               >
                 {item.icon}
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium text-sm whitespace-nowrap">{item.label}</span>
               </button>
             );
           })}
         </nav>
 
         {/* User Info & Logout Button */}
-        <div className="p-4 border-t border-slate-200 bg-slate-50">
-          <div className="mb-3 pb-3 border-b border-slate-200">
-            <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
-            <p className="text-xs text-slate-600 mt-0.5">{user?.role}</p>
+        <div className={`p-4 border-t ${theme.sidebar.border} ${theme.sidebar.footerBg}`}>
+          <div className={`mb-3 pb-3 border-b ${theme.sidebar.border}`}>
+            <p className={`text-sm font-semibold ${theme.sidebar.activeText}`}>{user?.name}</p>
+            <p className={`text-xs ${theme.sidebar.text} mt-0.5`}>{user?.role}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors shadow-md"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

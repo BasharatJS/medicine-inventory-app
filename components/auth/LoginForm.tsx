@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import Button from '@/components/shared/Button';
 import Input from '@/components/shared/Input';
 import Alert from '@/components/shared/Alert';
@@ -11,6 +12,7 @@ import Alert from '@/components/shared/Alert';
 export default function LoginForm() {
   const router = useRouter();
   const { login, isLoading, error } = useAuthStore();
+  const { theme, themeName } = useTheme();
   // Local state: Store email, password, and rememberMe checkbox
   const [formData, setFormData] = useState({
     email: '',
@@ -28,16 +30,16 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className={`${theme.content.cardBg} rounded-2xl shadow-2xl p-8 w-full max-w-md border ${theme.content.cardBorder}`}>
       {/* UI: Logo and app title section */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-cyan-600 rounded-2xl mb-4">
+        <div className={`inline-flex items-center justify-center w-16 h-16 ${themeName === 'dark' ? 'bg-gray-700' : themeName === 'green' ? 'bg-emerald-600' : themeName === 'purple' ? 'bg-purple-600' : themeName === 'amber' ? 'bg-amber-600' : 'bg-cyan-600'} rounded-2xl mb-4`}>
           <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
           </svg>
         </div>
-        <h1 className="text-3xl font-bold text-slate-800">MediCare Inventory</h1>
-        <p className="text-slate-600 mt-2">Sign in to your account</p>
+        <h1 className={`text-3xl font-bold ${theme.content.text}`}>MediCare Inventory</h1>
+        <p className={`${theme.content.textSecondary} mt-2`}>Sign in to your account</p>
       </div>
 
       {/* UI: Show error alert if login fails */}
@@ -73,10 +75,10 @@ export default function LoginForm() {
               type="checkbox"
               checked={formData.rememberMe}
               onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-              className="w-4 h-4 text-sky-500 border-slate-300 rounded focus:ring-sky-500 focus:ring-2"
+              className={`w-4 h-4 ${themeName === 'dark' ? 'text-emerald-500 border-gray-600' : themeName === 'green' ? 'text-emerald-500 border-slate-300' : themeName === 'purple' ? 'text-purple-500 border-slate-300' : themeName === 'amber' ? 'text-amber-500 border-slate-300' : 'text-sky-500 border-slate-300'} rounded ${themeName === 'dark' ? 'focus:ring-emerald-500' : themeName === 'green' ? 'focus:ring-emerald-500' : themeName === 'purple' ? 'focus:ring-purple-500' : themeName === 'amber' ? 'focus:ring-amber-500' : 'focus:ring-sky-500'} focus:ring-2`}
               disabled={isLoading}
             />
-            <span className="ml-2 text-sm text-slate-600">Remember me</span>
+            <span className={`ml-2 text-sm ${theme.content.textSecondary}`}>Remember me</span>
           </label>
         </div>
 
@@ -87,11 +89,11 @@ export default function LoginForm() {
 
       {/* UI: Create account link */}
       <div className="mt-6 text-center">
-        <p className="text-sm text-slate-600">
+        <p className={`text-sm ${theme.content.textSecondary}`}>
           Don't have an account?{' '}
           <button
             onClick={() => router.push('/create-account')}
-            className="text-sky-600 hover:text-sky-700 font-medium"
+            className={`${themeName === 'dark' ? 'text-emerald-400 hover:text-emerald-300' : themeName === 'green' ? 'text-emerald-600 hover:text-emerald-700' : themeName === 'purple' ? 'text-purple-600 hover:text-purple-700' : themeName === 'amber' ? 'text-amber-600 hover:text-amber-700' : 'text-sky-600 hover:text-sky-700'} font-medium`}
             type="button"
           >
             Create Account
@@ -100,18 +102,18 @@ export default function LoginForm() {
       </div>
 
       {/* UI: Demo credentials section for testing (Owner and Pharmacist accounts) */}
-      <div className="mt-6 pt-6 border-t border-slate-200">
-        <p className="text-xs font-semibold text-slate-700 mb-3 text-center">Demo Credentials</p>
+      <div className={`mt-6 pt-6 border-t ${theme.content.cardBorder}`}>
+        <p className={`text-xs font-semibold ${theme.content.text} mb-3 text-center`}>Demo Credentials</p>
         <div className="space-y-3">
-          <div className="bg-gradient-to-r from-sky-50 to-emerald-50 p-3 rounded-lg">
-            <p className="text-xs font-semibold text-slate-700 mb-1">👨‍💼 Owner Account</p>
-            <p className="text-xs text-slate-600">Email: basharat@gmail.com</p>
-            <p className="text-xs text-slate-600">Password: 12345678</p>
+          <div className={`${themeName === 'dark' ? 'bg-gradient-to-r from-gray-700 to-gray-600' : themeName === 'green' ? 'bg-gradient-to-r from-emerald-50 to-teal-50' : themeName === 'purple' ? 'bg-gradient-to-r from-purple-50 to-pink-50' : themeName === 'amber' ? 'bg-gradient-to-r from-amber-50 to-orange-50' : 'bg-gradient-to-r from-sky-50 to-emerald-50'} p-3 rounded-lg`}>
+            <p className={`text-xs font-semibold ${theme.content.text} mb-1`}>👨‍💼 Owner Account</p>
+            <p className={`text-xs ${theme.content.textSecondary}`}>Email: basharat@gmail.com</p>
+            <p className={`text-xs ${theme.content.textSecondary}`}>Password: 12345678</p>
           </div>
-          <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-3 rounded-lg">
-            <p className="text-xs font-semibold text-slate-700 mb-1">💊 Pharmacist Account</p>
-            <p className="text-xs text-slate-600">Email: pharma@gmail.com</p>
-            <p className="text-xs text-slate-600">Password: 12345678</p>
+          <div className={`${themeName === 'dark' ? 'bg-gradient-to-r from-gray-700 to-gray-600' : themeName === 'green' ? 'bg-gradient-to-r from-teal-50 to-cyan-50' : themeName === 'purple' ? 'bg-gradient-to-r from-pink-50 to-rose-50' : themeName === 'amber' ? 'bg-gradient-to-r from-orange-50 to-yellow-50' : 'bg-gradient-to-r from-purple-50 to-blue-50'} p-3 rounded-lg`}>
+            <p className={`text-xs font-semibold ${theme.content.text} mb-1`}>💊 Pharmacist Account</p>
+            <p className={`text-xs ${theme.content.textSecondary}`}>Email: pharma@gmail.com</p>
+            <p className={`text-xs ${theme.content.textSecondary}`}>Password: 12345678</p>
           </div>
         </div>
       </div>

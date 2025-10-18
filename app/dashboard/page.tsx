@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import MetricCard from '@/components/dashboard/MetricCard';
 import QuickActions from '@/components/dashboard/QuickActions';
@@ -13,6 +14,7 @@ import PharmacistDashboard from '@/components/dashboard/PharmacistDashboard';
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isLoading } = useAuthStore();
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -38,8 +40,8 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
-          <p className="text-slate-600 mt-1">Welcome back, {user.name}!</p>
+          <h1 className={`text-3xl font-bold ${theme.content.text}`}>Dashboard</h1>
+          <p className={`${theme.content.textSecondary} mt-1`}>Welcome back, {user.name}!</p>
         </div>
 
         <MetricCard />

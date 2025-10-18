@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useExpiryStore } from '@/lib/store/expiryStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import ExpiryList from './ExpiryList';
 import Card from '@/components/shared/Card';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
 
 export default function ExpiryDashboard() {
   const { fetchExpiringBatches, isLoading } = useExpiryStore();
+  const { theme, themeName } = useTheme();
   const [activeFilter, setActiveFilter] = useState<number>(30);
 
   useEffect(() => {
@@ -24,8 +26,8 @@ export default function ExpiryDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-800">Expiry Management</h1>
-        <p className="text-slate-600 mt-1">Monitor and manage expiring medicines</p>
+        <h1 className={`text-3xl font-bold ${theme.content.text}`}>Expiry Management</h1>
+        <p className={`${theme.content.textSecondary} mt-1`}>Monitor and manage expiring medicines</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -36,6 +38,14 @@ export default function ExpiryDashboard() {
             className={`p-4 rounded-xl text-white transition-all ${
               activeFilter === filter.value
                 ? `bg-gradient-to-br ${filter.color} scale-105 shadow-lg`
+                : themeName === 'dark'
+                ? 'bg-gray-600 hover:bg-gray-500'
+                : themeName === 'green'
+                ? 'bg-emerald-400 hover:bg-emerald-500'
+                : themeName === 'purple'
+                ? 'bg-purple-400 hover:bg-purple-500'
+                : themeName === 'amber'
+                ? 'bg-amber-400 hover:bg-amber-500'
                 : 'bg-slate-400 hover:bg-slate-500'
             }`}
           >

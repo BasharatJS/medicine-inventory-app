@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useExpiryStore } from '@/lib/store/expiryStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import Card from '@/components/shared/Card';
 import ExpiryBadge from '@/components/expiry/ExpiryBadge';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
@@ -10,6 +11,7 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner';
 export default function ExpiryAlerts() {
   const router = useRouter();
   const { expiringBatches, fetchExpiringBatches, isLoading } = useExpiryStore();
+  const { theme, themeName } = useTheme();
 
   useEffect(() => {
     fetchExpiringBatches(30); // Fetch batches expiring in 30 days
@@ -22,13 +24,29 @@ export default function ExpiryAlerts() {
     return diff;
   };
 
+  // Get button colors based on theme
+  const getButtonColors = () => {
+    switch (themeName) {
+      case 'green':
+        return 'text-emerald-600 hover:text-emerald-700';
+      case 'purple':
+        return 'text-purple-600 hover:text-purple-700';
+      case 'amber':
+        return 'text-amber-600 hover:text-amber-700';
+      case 'dark':
+        return 'text-gray-300 hover:text-white';
+      default: // light
+        return 'text-slate-600 hover:text-slate-700';
+    }
+  };
+
   return (
     <Card>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-slate-800">Expiry Alerts</h2>
+        <h2 className={`text-xl font-semibold ${theme.content.text}`}>Expiry Alerts</h2>
         <button
           onClick={() => router.push('/expiry')}
-          className="text-sm text-sky-600 hover:text-sky-700 font-medium"
+          className={`text-sm ${getButtonColors()} font-medium`}
         >
           View All
         </button>
@@ -43,20 +61,20 @@ export default function ExpiryAlerts() {
           <svg className="w-16 h-16 mx-auto text-emerald-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="text-slate-600 font-medium">All Clear!</p>
-          <p className="text-sm text-slate-500 mt-1">No medicines expiring soon</p>
+          <p className={`${theme.content.text} font-medium`}>All Clear!</p>
+          <p className={`text-sm ${theme.content.textSecondary} mt-1`}>No medicines expiring soon</p>
         </div>
       ) : (
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {expiringBatches.map((batch) => {
             const daysRemaining = getDaysRemaining(batch.expiryDate);
             return (
-              <div key={batch.id} className="p-3 rounded-lg border border-slate-200 hover:border-slate-300 transition-colors">
+              <div key={batch.id} className={`p-3 rounded-lg border ${theme.content.cardBorder} hover:border-opacity-70 transition-colors`}>
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-medium text-slate-800 text-sm">{batch.medicineName}</h3>
+                  <h3 className={`font-medium ${theme.content.text} text-sm`}>{batch.medicineName}</h3>
                   <ExpiryBadge daysRemaining={daysRemaining} />
                 </div>
-                <div className="text-xs text-slate-600 space-y-1">
+                <div className={`text-xs ${theme.content.textSecondary} space-y-1`}>
                   <p>Batch: {batch.batchNumber}</p>
                   <p>Qty: {batch.quantity} units</p>
                   <p>Expiry: {new Date(batch.expiryDate.toDate()).toLocaleDateString()}</p>

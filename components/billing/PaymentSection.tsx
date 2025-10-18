@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useBillingStore } from '@/lib/store/billingStore';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useCustomerStore } from '@/lib/store/customerStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import Card from '@/components/shared/Card';
 import Input from '@/components/shared/Input';
 import Button from '@/components/shared/Button';
@@ -19,6 +20,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
   const { user } = useAuthStore();
   const { cart, cartTotal, processSale, isLoading, error } = useBillingStore();
   const { searchCustomerByPhone } = useCustomerStore();
+  const { theme, themeName } = useTheme();
   // Local state: Payment method, customer details, search status
   const [paymentMethod, setPaymentMethod] = useState('CASH');
   const [customerDetails, setCustomerDetails] = useState({
@@ -94,7 +96,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold text-slate-800 mb-4">Payment</h2>
+      <h2 className={`text-xl font-semibold ${theme.content.text} mb-4`}>Payment</h2>
 
       {/* UI: Show error alert if sale processing fails */}
       {error && <Alert type="error" message={error} className="mb-4" />}
@@ -102,7 +104,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
       <div className="space-y-4">
         {/* UI: Customer search by phone (optional for linking sale to customer) */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Customer Details (Optional)</label>
+          <label className={`block text-sm font-medium ${theme.content.text} mb-2`}>Customer Details (Optional)</label>
           <div className="flex gap-2">
             <Input
               placeholder="Phone Number"
@@ -127,11 +129,11 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
 
         {/* UI: Show customer found card with loyalty points */}
         {customerFound && (
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+          <div className={`${themeName === 'dark' ? 'bg-emerald-900 border-emerald-700' : 'bg-emerald-50 border-emerald-200'} border rounded-lg p-3`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold text-emerald-900">{customerDetails.name}</p>
-                <p className="text-sm text-emerald-700">Existing Customer</p>
+                <p className={`font-semibold ${themeName === 'dark' ? 'text-emerald-100' : 'text-emerald-900'}`}>{customerDetails.name}</p>
+                <p className={`text-sm ${themeName === 'dark' ? 'text-emerald-300' : 'text-emerald-700'}`}>Existing Customer</p>
               </div>
               <Badge variant="success">
                 {customerDetails.loyaltyPoints} pts
@@ -159,7 +161,7 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
 
         {/* UI: Payment method selection (CASH/UPI/CARD) */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+          <label className={`block text-sm font-medium ${theme.content.text} mb-2`}>Payment Method</label>
           <div className="grid grid-cols-3 gap-2">
             {paymentMethods.map((method) => (
               <button
@@ -167,8 +169,16 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
                 onClick={() => setPaymentMethod(method.value)}
                 className={`p-3 rounded-lg border-2 transition-all ${
                   paymentMethod === method.value
-                    ? 'border-sky-500 bg-sky-50 text-sky-700'
-                    : 'border-slate-200 hover:border-slate-300'
+                    ? themeName === 'dark'
+                      ? 'border-emerald-500 bg-emerald-900 text-emerald-100'
+                      : themeName === 'green'
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
+                      : themeName === 'purple'
+                      ? 'border-purple-500 bg-purple-50 text-purple-700'
+                      : themeName === 'amber'
+                      ? 'border-amber-500 bg-amber-50 text-amber-700'
+                      : 'border-sky-500 bg-sky-50 text-sky-700'
+                    : `border ${theme.content.cardBorder} ${themeName === 'dark' ? 'hover:border-gray-500' : themeName === 'green' ? 'hover:border-emerald-300' : themeName === 'purple' ? 'hover:border-purple-300' : themeName === 'amber' ? 'hover:border-amber-300' : 'hover:border-slate-300'} ${theme.content.text}`
                 }`}
                 disabled={isLoading}
               >
@@ -180,11 +190,11 @@ export default function PaymentSection({ onSaleComplete }: PaymentSectionProps) 
         </div>
 
         {/* UI: Amount to collect and complete sale button */}
-        <div className="pt-4 border-t border-slate-200">
-          <div className="bg-slate-50 p-4 rounded-lg mb-4">
+        <div className={`pt-4 border-t ${theme.content.cardBorder}`}>
+          <div className={`${themeName === 'dark' ? 'bg-gray-700' : themeName === 'green' ? 'bg-emerald-50' : themeName === 'purple' ? 'bg-purple-50' : themeName === 'amber' ? 'bg-amber-50' : 'bg-slate-50'} p-4 rounded-lg mb-4`}>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Amount to Collect:</span>
-              <span className="text-2xl font-bold text-emerald-600">
+              <span className={theme.content.textSecondary}>Amount to Collect:</span>
+              <span className={`text-2xl font-bold ${themeName === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
                 ₹{Math.round(cartTotal.grandTotal)}
               </span>
             </div>

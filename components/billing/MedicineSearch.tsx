@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useMedicineStore } from '@/lib/store/medicineStore';
 import { useBatchStore } from '@/lib/store/batchStore';
 import { useBillingStore } from '@/lib/store/billingStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import SearchBar from '@/components/inventory/SearchBar';
 import Badge from '@/components/shared/Badge';
 
@@ -12,6 +13,7 @@ export default function MedicineSearch() {
   const { medicines, fetchMedicines } = useMedicineStore();
   const { batches, fetchBatchesByMedicine } = useBatchStore();
   const { addToCart } = useBillingStore();
+  const { theme, themeName } = useTheme();
   // Local state: Search term, dropdown visibility, selected medicine ID
   const [searchTerm, setSearchTerm] = useState('');
   const [showResults, setShowResults] = useState(false);
@@ -73,15 +75,15 @@ export default function MedicineSearch() {
 
         {/* UI: Dropdown showing filtered medicine results */}
         {showResults && filteredMedicines.length > 0 && (
-          <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+          <div className={`absolute z-10 w-full mt-2 ${theme.content.cardBg} border ${theme.content.cardBorder} rounded-lg shadow-lg max-h-80 overflow-y-auto`}>
             {filteredMedicines.map((medicine) => (
               <button
                 key={medicine.id}
                 onClick={() => handleSelectMedicine(medicine.id)}
-                className="w-full p-4 text-left hover:bg-slate-50 transition-colors border-b border-slate-100 last:border-0"
+                className={`w-full p-4 text-left ${themeName === 'dark' ? 'hover:bg-gray-700' : themeName === 'green' ? 'hover:bg-emerald-50' : themeName === 'purple' ? 'hover:bg-purple-50' : themeName === 'amber' ? 'hover:bg-amber-50' : 'hover:bg-slate-50'} transition-colors border-b ${theme.content.cardBorder} last:border-0`}
               >
-                <div className="font-medium text-slate-900">{medicine.name}</div>
-                <div className="text-sm text-slate-600">{medicine.genericName}</div>
+                <div className={`font-medium ${theme.content.text}`}>{medicine.name}</div>
+                <div className={`text-sm ${theme.content.textSecondary}`}>{medicine.genericName}</div>
                 <div className="flex items-center justify-between mt-2">
                   <Badge variant="info">{medicine.category}</Badge>
                   <span className="text-sm font-semibold text-emerald-600">₹{medicine.mrp}</span>
@@ -94,8 +96,8 @@ export default function MedicineSearch() {
 
       {/* UI: Batch selection (FEFO - First Expiry First Out) sorted by expiry date */}
       {selectedMedicine && batches.length > 0 && (
-        <div className="bg-slate-50 p-4 rounded-lg">
-          <h3 className="font-semibold text-slate-800 mb-3">Select Batch (FEFO - First Expiry First Out)</h3>
+        <div className={`${themeName === 'dark' ? 'bg-gray-700' : themeName === 'green' ? 'bg-emerald-50' : themeName === 'purple' ? 'bg-purple-50' : themeName === 'amber' ? 'bg-amber-50' : 'bg-slate-50'} p-4 rounded-lg`}>
+          <h3 className={`font-semibold ${theme.content.text} mb-3`}>Select Batch (FEFO - First Expiry First Out)</h3>
           <div className="space-y-2">
             {/* Filter batches with quantity > 0, sort by expiry date (earliest first) */}
             {batches
@@ -107,12 +109,12 @@ export default function MedicineSearch() {
                   <button
                     key={batch.id}
                     onClick={() => medicine && handleAddBatchToCart(batch, medicine)}
-                    className="w-full p-3 bg-white rounded-lg border border-slate-200 hover:border-sky-500 hover:bg-sky-50 transition-colors text-left"
+                    className={`w-full p-3 ${theme.content.cardBg} rounded-lg border ${theme.content.cardBorder} ${themeName === 'dark' ? 'hover:border-gray-500 hover:bg-gray-600' : themeName === 'green' ? 'hover:border-emerald-500 hover:bg-emerald-100' : themeName === 'purple' ? 'hover:border-purple-500 hover:bg-purple-100' : themeName === 'amber' ? 'hover:border-amber-500 hover:bg-amber-100' : 'hover:border-slate-500 hover:bg-slate-100'} transition-colors text-left`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium text-slate-900">Batch: {batch.batchNumber}</p>
-                        <p className="text-sm text-slate-600">
+                        <p className={`font-medium ${theme.content.text}`}>Batch: {batch.batchNumber}</p>
+                        <p className={`text-sm ${theme.content.textSecondary}`}>
                           Stock: {batch.quantity} • Expiry: {new Date(batch.expiryDate.toDate()).toLocaleDateString()}
                         </p>
                       </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useMedicineStore } from '@/lib/store/medicineStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import EditMedicineForm from '@/components/inventory/EditMedicineForm';
 import BatchList from '@/components/inventory/BatchList';
@@ -14,6 +15,7 @@ export default function MedicineDetailsPage() {
   const params = useParams();
   const { user, isLoading: authLoading } = useAuthStore();
   const { currentMedicine, fetchMedicineById, isLoading } = useMedicineStore();
+  const { theme, themeName } = useTheme();
   const [activeTab, setActiveTab] = useState<'details' | 'batches'>('details');
 
   useEffect(() => {
@@ -39,6 +41,22 @@ export default function MedicineDetailsPage() {
     return null;
   }
 
+  // Get tab colors based on theme
+  const getActiveTabColor = () => {
+    switch (themeName) {
+      case 'green':
+        return 'border-emerald-500 text-emerald-600';
+      case 'purple':
+        return 'border-purple-500 text-purple-600';
+      case 'amber':
+        return 'border-amber-500 text-amber-600';
+      case 'dark':
+        return 'border-gray-400 text-gray-300';
+      default: // light
+        return 'border-slate-500 text-slate-600';
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
@@ -48,19 +66,30 @@ export default function MedicineDetailsPage() {
           </div>
         ) : currentMedicine ? (
           <>
+            {/* Back Button */}
+            <button
+              onClick={() => router.push('/inventory')}
+              className={`flex items-center gap-2 mb-4 ${theme.content.textSecondary} hover:${theme.content.text} transition-colors cursor-pointer`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="font-medium hidden sm:inline">Back to Inventory</span>
+            </button>
+
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-slate-800">{currentMedicine.name}</h1>
-              <p className="text-slate-600 mt-1">{currentMedicine.genericName}</p>
+              <h1 className={`text-3xl font-bold ${theme.content.text}`}>{currentMedicine.name}</h1>
+              <p className={`${theme.content.textSecondary} mt-1`}>{currentMedicine.genericName}</p>
             </div>
 
-            <div className="border-b border-slate-200 mb-6">
+            <div className={`border-b ${theme.content.cardBorder} mb-6`}>
               <div className="flex space-x-8">
                 <button
                   onClick={() => setActiveTab('details')}
                   className={`pb-4 px-2 border-b-2 transition-colors ${
                     activeTab === 'details'
-                      ? 'border-sky-500 text-sky-600 font-semibold'
-                      : 'border-transparent text-slate-600 hover:text-slate-800'
+                      ? `${getActiveTabColor()} font-semibold`
+                      : `border-transparent ${theme.content.textSecondary} hover:${theme.content.text}`
                   }`}
                 >
                   Medicine Details
@@ -69,8 +98,8 @@ export default function MedicineDetailsPage() {
                   onClick={() => setActiveTab('batches')}
                   className={`pb-4 px-2 border-b-2 transition-colors ${
                     activeTab === 'batches'
-                      ? 'border-sky-500 text-sky-600 font-semibold'
-                      : 'border-transparent text-slate-600 hover:text-slate-800'
+                      ? `${getActiveTabColor()} font-semibold`
+                      : `border-transparent ${theme.content.textSecondary} hover:${theme.content.text}`
                   }`}
                 >
                   Batch Management
@@ -86,7 +115,7 @@ export default function MedicineDetailsPage() {
           </>
         ) : (
           <div className="text-center py-12">
-            <p className="text-slate-600">Medicine not found</p>
+            <p className={theme.content.textSecondary}>Medicine not found</p>
           </div>
         )}
       </div>

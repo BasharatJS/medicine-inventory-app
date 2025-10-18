@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMedicineStore } from '@/lib/store/medicineStore';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 import { Medicine } from '@/lib/types';
 import Input from '@/components/shared/Input';
 import Select from '@/components/shared/Select';
@@ -17,6 +18,7 @@ interface EditMedicineFormProps {
 export default function EditMedicineForm({ medicine }: EditMedicineFormProps) {
   const router = useRouter();
   const { updateMedicine, deleteMedicine, isLoading, error } = useMedicineStore();
+  const { theme, themeName } = useTheme();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     name: medicine.name,
@@ -55,6 +57,22 @@ export default function EditMedicineForm({ medicine }: EditMedicineFormProps) {
       if (success) {
         router.push('/inventory');
       }
+    }
+  };
+
+  // Get file upload button colors based on theme
+  const getFileUploadColors = () => {
+    switch (themeName) {
+      case 'green':
+        return 'file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100';
+      case 'purple':
+        return 'file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100';
+      case 'amber':
+        return 'file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100';
+      case 'dark':
+        return 'file:bg-gray-700 file:text-gray-300 hover:file:bg-gray-600';
+      default: // light
+        return 'file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100';
     }
   };
 
@@ -162,38 +180,40 @@ export default function EditMedicineForm({ medicine }: EditMedicineFormProps) {
           />
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
+            <label className={`block text-sm font-medium ${theme.content.text} mb-2`}>
               Update Medicine Image
             </label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+              className={`block w-full text-sm ${theme.content.textSecondary} file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold ${getFileUploadColors()}`}
               disabled={isLoading}
             />
           </div>
         </div>
 
-        <div className="flex justify-between mt-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between gap-4 mt-6">
           <Button
             type="button"
             variant="danger"
             onClick={handleDelete}
             disabled={isLoading}
+            className="w-full sm:w-auto order-3 sm:order-1"
           >
             Delete Medicine
           </Button>
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 order-1 sm:order-2">
             <Button
               type="button"
               variant="secondary"
               onClick={() => router.push('/inventory')}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" isLoading={isLoading}>
+            <Button type="submit" variant="primary" isLoading={isLoading} className="w-full sm:w-auto">
               Update Medicine
             </Button>
           </div>

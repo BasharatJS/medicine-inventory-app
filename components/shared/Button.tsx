@@ -1,6 +1,7 @@
 'use client';
 
 import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { useTheme } from '@/lib/contexts/ThemeContext';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -20,13 +21,14 @@ export default function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center';
+  const { theme } = useTheme();
+  const baseStyles = 'font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg';
 
   const variantStyles = {
-    primary: 'bg-cyan-600 hover:bg-cyan-700 text-white focus:ring-cyan-500',
-    secondary: 'bg-slate-200 hover:bg-slate-300 text-slate-800 focus:ring-slate-400',
-    danger: 'bg-red-500 hover:bg-red-600 text-white focus:ring-red-500',
-    success: 'bg-emerald-500 hover:bg-emerald-600 text-white focus:ring-emerald-500',
+    primary: `bg-gradient-to-r ${theme.primary.main} hover:${theme.primary.dark} text-white focus:ring-cyan-400`,
+    secondary: 'bg-gradient-to-r from-slate-600 to-slate-700 hover:from-slate-700 hover:to-slate-800 text-white focus:ring-slate-400',
+    danger: 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white focus:ring-red-400',
+    success: 'bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white focus:ring-emerald-400',
   };
 
   const sizeStyles = {
