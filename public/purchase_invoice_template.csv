@@ -1,0 +1,6 @@
+medicineName,genericName,manufacturer,category,batchNumber,quantity,mrp,purchasePrice,manufacturingDate,expiryDate,gstRate,rackLocation
+Paracetamol 500mg,Paracetamol,ABC Pharma,Tablet,BATCH001,100,50.00,35.00,01/01/2024,01/01/2026,12,A-1
+Amoxicillin 250mg,Amoxicillin,XYZ Pharma,Capsule,BATCH002,50,120.00,85.00,15/02/2024,15/02/2026,12,B-2
+Cetirizine 10mg,Cetirizine,DEF Pharma,Tablet,BATCH003,200,25.00,18.00,10/03/2024,10/03/2026,12,A-3
+Ibuprofen 400mg,Ibuprofen,ABC Pharma,Tablet,BATCH004,150,80.00,55.00,20/01/2024,20/01/2026,12,C-1
+Cough Syrup 100ml,Dextromethorphan,GHI Pharma,Syrup,BATCH005,75,150.00,110.00,05/02/2024,05/02/2026,12,D-2

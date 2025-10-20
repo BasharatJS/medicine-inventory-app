@@ -309,3 +309,43 @@ export interface ProfitableItem {
   profit: number;
   profitMargin: number;
 }
+
+// Phase 2: Purchase Invoice Types (Bulk Entry)
+export interface PurchaseInvoice {
+  id: string;
+  invoiceNumber: string;
+  supplierId: string;
+  supplierName: string;
+  invoiceDate: Timestamp;
+  invoiceImageUrl?: string;
+  items: PurchaseInvoiceItem[];
+  subtotal: number;
+  gstAmount: number;
+  totalAmount: number;
+  discount: number;
+  status: 'DRAFT' | 'CONFIRMED';
+  notes?: string;
+  userId: string;
+  userName: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+export interface PurchaseInvoiceItem {
+  tempId: string; // Temporary ID for frontend editing
+  medicineId?: string; // Will be auto-matched or manually selected
+  medicineName: string;
+  genericName?: string;
+  manufacturer?: string;
+  category?: string;
+  batchNumber: string;
+  quantity: number;
+  mrp: number;
+  purchasePrice: number;
+  manufacturingDate: Timestamp;
+  expiryDate: Timestamp;
+  gstRate: number;
+  total: number;
+  isNewMedicine: boolean; // If medicine doesn't exist in inventory
+  rackLocation?: string;
+}
